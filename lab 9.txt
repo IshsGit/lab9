@@ -1,5 +1,7 @@
 For this mini-project I basically took the spotify project from data structures and produced a query to insert a song. I used mySQL, and JDBC.I used w3schools, mySQL manual and Telusko's channel from youtube.
 
+I worked on this one mostly because its something i am familiar with and it was easy to incorporate with my existing knowledge. mySQL was the first relationalal database language i learned. I jumped into it since it was a hot language to learn for data engineers. I was learning linux and shell scripting at one point and thought i might as well throw mySQL into the picture. Luckily it was fairly easy to jump into. 
+
 You can choose from the files or copy from here/
 
 Here is the code for the JDBC connection and query:
