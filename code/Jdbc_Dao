@@ -1,0 +1,93 @@
+package Data_Insert;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.*;
+
+import java.sql.*;
+
+public class Jdbc_Dao {
+
+	public void go() throws Exception {
+		getSong();
+	}
+	
+	Connection con = null;
+	public void Connect() {
+		String db_url = "jdbc:mysql://localhost:3306/spotify_charts";
+		String user = "root";
+		String pw = "1234567";
+		
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			con = DriverManager.getConnection(db_url,user,pw);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void getSong() throws Exception {
+		
+		String query = "INSERT INTO songs VALUES (?,?,?,?,?)";
+		
+		PreparedStatement ps = con.prepareStatement(query);
+		
+		BufferedReader br = new BufferedReader(new FileReader("regional-global-daily-latest (1).csv"));
+		
+		List<String> position = new ArrayList<>();
+		List<String> track = new ArrayList<>();
+		List<String> artist = new ArrayList<>();
+		List<String> streams = new ArrayList<>();
+		List<String> url = new ArrayList<>();
+		
+		String line = null;
+		int i = 0;
+		int j = 0;
+		while((line = br.readLine())!=null) {
+		if(i > 0) {
+		String[] split = line.split(",");
+		try {
+		position.add(split[0]); ps.setString(1, split[0]);
+		track.add(split[1]); ps.setString(2, split[1]);
+		artist.add(split[2]); ps.setString(3, split[2]);
+		streams.add(split[3]); ps.setString(4, split[3]);
+		if(split[4].contains("https") != true) {
+			split[1] = split[1]+split[2];
+			split[2] = split[3];
+			split[3] = split[4];
+			split[4] = split[5];
+			position.add(split[0]); ps.setString(1, split[0]);
+			track.add(split[1]); ps.setString(2, split[1]);
+			artist.add(split[2]); ps.setString(3, split[2]);
+			streams.add(split[3]); ps.setString(4, split[3]);
+			url.add(split[4]); ps.setString(5, split[4]);
+		Songs songs = new Songs(position,track,artist,streams,url);
+		} 
+		else {
+			url.add(split[4]);  ps.setString(5, split[4]);
+		}
+		Songs songs = new Songs(position,track,artist,streams,url);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		int count = ps.executeUpdate();
+		
+		}
+		i++;
+		}
+		
+		System.out.println(i-1 + " row/s affected");
+		
+		con.close();
+		ps.close();
+	}
+	
+	
+	public static void main(String[] args) throws Exception {
+		Jdbc_Dao obj = new Jdbc_Dao();
+		obj.Connect();
+		obj.go();
+	}
+
+}
