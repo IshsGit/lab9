@@ -1,0 +1,157 @@
+For this mini-project I basically took the spotify project from data structures and produced a query to insert a song. I used mySQL, and JDBC.I used w3schools, mySQL manual and Telusko's channel from youtube.
+
+You can choose from the files or copy from here/
+
+Here is the code for the JDBC connection and query:
+
+package Data_Insert;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.*;
+
+import java.sql.*;
+
+public class Jdbc_Dao {
+
+	public void go() throws Exception {
+		getSong();
+	}
+	
+	Connection con = null;
+	public void Connect() {
+		String db_url = "jdbc:mysql://localhost:3306/spotify_charts";
+		String user = "root";
+		String pw = "1234567";
+		
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			con = DriverManager.getConnection(db_url,user,pw);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void getSong() throws Exception {
+		
+		String query = "INSERT INTO songs VALUES (?,?,?,?,?)";
+		
+		PreparedStatement ps = con.prepareStatement(query);
+		
+		BufferedReader br = new BufferedReader(new FileReader("regional-global-daily-latest (1).csv"));
+		
+		List<String> position = new ArrayList<>();
+		List<String> track = new ArrayList<>();
+		List<String> artist = new ArrayList<>();
+		List<String> streams = new ArrayList<>();
+		List<String> url = new ArrayList<>();
+		
+		String line = null;
+		int i = 0;
+		int j = 0;
+		while((line = br.readLine())!=null) {
+		if(i > 0) {
+		String[] split = line.split(",");
+		try {
+		position.add(split[0]); ps.setString(1, split[0]);
+		track.add(split[1]); ps.setString(2, split[1]);
+		artist.add(split[2]); ps.setString(3, split[2]);
+		streams.add(split[3]); ps.setString(4, split[3]);
+		if(split[4].contains("https") != true) {
+			split[1] = split[1]+split[2];
+			split[2] = split[3];
+			split[3] = split[4];
+			split[4] = split[5];
+			position.add(split[0]); ps.setString(1, split[0]);
+			track.add(split[1]); ps.setString(2, split[1]);
+			artist.add(split[2]); ps.setString(3, split[2]);
+			streams.add(split[3]); ps.setString(4, split[3]);
+			url.add(split[4]); ps.setString(5, split[4]);
+		Songs songs = new Songs(position,track,artist,streams,url);
+		} 
+		else {
+			url.add(split[4]);  ps.setString(5, split[4]);
+		}
+		Songs songs = new Songs(position,track,artist,streams,url);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		int count = ps.executeUpdate();
+		
+		}
+		i++;
+		}
+		
+		System.out.println(i-1 + " row/s affected");
+		
+		con.close();
+		ps.close();
+	}
+	
+	
+	public static void main(String[] args) throws Exception {
+		Jdbc_Dao obj = new Jdbc_Dao();
+		obj.Connect();
+		obj.go();
+	}
+
+}
+
+And here is the code for the DAO:
+
+package Data_Insert;
+
+import java.util.*;
+
+public class Songs {
+
+	List<Songs> newSongs = new ArrayList<>();
+	
+	private List<String> position = new ArrayList<>();
+	private List<String> trackname = new ArrayList<>();
+	private List<String> artist = new ArrayList<>();
+	private List<String> streams = new ArrayList<>();
+	private List<String> url = new ArrayList<>();
+	
+	public Songs(List<String> position, List<String> trackname, List<String> artist, List<String> streams, List<String> url) {
+		super();
+		this.position = position;
+		this.trackname = trackname;
+		this.artist = artist;
+		this.streams = streams;
+		this.url = url;
+	}
+	public List<String> getPosition() {
+		return position;
+	}
+	
+	public List<String> getTrackname() {
+		return trackname;
+	}
+	public List<String> getArtist() {
+		return artist;
+	}
+	public List<String> getStreams() {
+		return streams;
+	}
+	public List<String> getUrl() {
+		return url;
+	}
+	public void setPosition(List<String> position) {
+		this.position = position;
+	}
+	public void setTrackname(List<String> trackname) {
+		this.trackname = trackname;
+	}
+	public void setArtist(List<String> artist) {
+		this.artist = artist;
+	}
+	public void setStreams(List<String> streams) {
+		this.streams = streams;
+	}
+	public void setUrl(List<String> url) {
+		this.url = url;
+	}
+	
+}
