@@ -1,1 +1,1 @@
-# lab9 - For this mini-project I basically took the spotify project from data structures and produced a query to insert a song. I used mySQL, and JDBC.I used w3schools, mySQL manual and Telusko's channel from youtube.
+# lab9 
